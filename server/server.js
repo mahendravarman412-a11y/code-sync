@@ -1,4 +1,5 @@
 
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -7,7 +8,12 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Authentication routes
@@ -21,6 +27,14 @@ app.get('/', (req, res) => {
   res.send('CodeSync Backend is Running!');
 });
 
+// Health check route
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'CodeSync server is healthy'
+  });
+});
+
 // Connect MongoDB and start server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
@@ -28,10 +42,11 @@ mongoose.connect(process.env.MONGO_URI)
 
     const PORT = process.env.PORT || 5001;
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`CodeSync Server running on port ${PORT}`);
     });
   })
   .catch((error) => {
     console.error('MongoDB Connection Failed:', error.message);
+    process.exit(1);
   });
