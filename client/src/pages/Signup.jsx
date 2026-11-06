@@ -1,5 +1,8 @@
+
+
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { API_URL } from '../config'
 
 function Signup() {
   const [name, setName] = useState('')
@@ -26,7 +29,7 @@ function Signup() {
     try {
       setLoading(true)
 
-      const response = await fetch('http://localhost:5001/api/auth/signup', {
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -50,7 +53,10 @@ function Signup() {
       setPassword('')
       setConfirmPassword('')
     } catch (error) {
-      setMessage(error.message || 'Something went wrong.')
+      console.error('Signup error:', error)
+      setMessage(
+        error.message || 'Unable to connect to CodeSync server.'
+      )
     } finally {
       setLoading(false)
     }

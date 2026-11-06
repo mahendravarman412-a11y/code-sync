@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
+import { API_URL } from '../config';
 
 function Room() {
   const { roomId } = useParams();
@@ -20,7 +21,7 @@ function Room() {
       setOutput('Running your code...');
 
       const response = await fetch(
-        'http://localhost:5001/api/execute',
+        `${API_URL}/api/execute`,
         {
           method: 'POST',
           headers: {
@@ -187,5 +188,3 @@ function Room() {
 }
 
 export default Room;
-
-
