@@ -1,5 +1,3 @@
-
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -7,20 +5,36 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
+// CORS configuration
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175'
+].filter(Boolean);
+
 app.use(cors({
-  origin: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // Authentication routes
 app.use('/api/auth', require('./routes/auth'));
 
-// Code execution routes
-app.use('/api/execute', require('./routes/execute'));
+// Enable code execution only during local development.
+// Public execution must use a secure isolated sandbox.
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api/execute', require('./routes/execute'));
+}
 
 // Test route
 app.get('/', (req, res) => {
